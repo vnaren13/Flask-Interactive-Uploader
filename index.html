@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Animal & File Uploader</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Nunito (a rounded, friendly font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for a kid-friendly look */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff; /* A soft, light blue background */
+        }
+        /* Custom animation for the button */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .button-bounce:hover {
+            animation: bounce 0.5s ease-in-out;
+        }
+        /* Styling for custom checkboxes */
+        .animal-label {
+            transition: all 0.2s ease-in-out;
+            border: 2px solid #e5e7eb;
+        }
+        .animal-checkbox:checked + .animal-label {
+            transform: scale(1.05);
+            border-color: #60a5fa; /* Blue-400 */
+            background-color: #eff6ff; /* Blue-50 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <!-- Box 1: Animal Selector -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl border-t-8 border-pink-400">
+            <h2 class="text-3xl font-extrabold mb-6 text-gray-700 text-center">Pick a Pet! 🐾</h2>
+            <div class="space-y-4 mb-6">
+                <!-- Checkbox for Cat -->
+                <div>
+                    <input type="checkbox" id="cat" name="animal" value="cat" class="animal-checkbox hidden">
+                    <label for="cat" class="animal-label flex items-center cursor-pointer p-4 rounded-xl">
+                        <span class="text-3xl mr-4">🐱</span>
+                        <span class="text-xl font-bold text-gray-600">Cat</span>
+                    </label>
+                </div>
+                <!-- Checkbox for Dog -->
+                <div>
+                    <input type="checkbox" id="dog" name="animal" value="dog" class="animal-checkbox hidden">
+                    <label for="dog" class="animal-label flex items-center cursor-pointer p-4 rounded-xl">
+                        <span class="text-3xl mr-4">🐶</span>
+                        <span class="text-xl font-bold text-gray-600">Dog</span>
+                    </label>
+                </div>
+                <!-- Checkbox for Elephant -->
+                <div>
+                    <input type="checkbox" id="elephant" name="animal" value="elephant" class="animal-checkbox hidden">
+                    <label for="elephant" class="animal-label flex items-center cursor-pointer p-4 rounded-xl">
+                        <span class="text-3xl mr-4">🐘</span>
+                        <span class="text-xl font-bold text-gray-600">Elephant</span>
+                    </label>
+                </div>
+            </div>
+            <!-- Image Display Area -->
+            <div id="image-container" class="mt-4 h-64 bg-blue-100 rounded-lg flex items-center justify-center border-2 border-dashed border-blue-300">
+                <img id="animal-image" src="https://placehold.co/400x250/dbeafe/3b82f6?text=Pick+one!" alt="Selected animal" class="max-h-full max-w-full object-contain rounded-md">
+            </div>
+        </div>
+
+        <!-- Box 2: File Uploader -->
+        <div class="bg-white p-8 rounded-2xl shadow-xl border-t-8 border-green-400">
+            <h2 class="text-3xl font-extrabold mb-6 text-gray-700 text-center">Send a File! 🚀</h2>
+            <!-- File Upload Form -->
+            <form id="upload-form" enctype="multipart/form-data" class="space-y-6">
+                <label for="file-upload" class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-500 transition-colors cursor-pointer block">
+                    <div class="flex flex-col items-center">
+                        <svg class="mx-auto h-16 w-16 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3v11.25" />
+                        </svg>
+                        <span class="mt-2 font-medium text-green-600">Click here to choose a file</span>
+                        <p id="file-name-display" class="text-sm text-gray-500 mt-1">No file selected</p>
+                    </div>
+                    <input id="file-upload" name="file" type="file" class="sr-only">
+                </label>
+                <button type="submit" class="w-full bg-green-500 text-white font-bold py-4 px-4 rounded-xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all transform hover:scale-105 button-bounce text-lg">
+                    Upload!
+                </button>
+            </form>
+            <!-- File Info Display Area -->
+            <div id="file-info" class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg hidden">
+                <h3 class="font-bold text-green-800 mb-2">Your File Info:</h3>
+                <div id="info-content" class="text-sm text-gray-600 space-y-1"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- ANIMAL SELECTOR LOGIC ---
+        const checkboxes = document.querySelectorAll('.animal-checkbox');
+        const animalImage = document.getElementById('animal-image');
+        const imageContainer = document.getElementById('image-container');
+
+        // Image URLs (using placeholders)
+        const animalImages = {
+        cat: 'images/cat.png', 
+        dog: 'images/Dog.png',
+        elephant: 'images/elephant.png',
+        default: 'https://placehold.co/400x250/e2e8f0/cbd5e0?text=Select+an+animal'
+        };
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Uncheck all other checkboxes to simulate radio button behavior
+                if (this.checked) {
+                    checkboxes.forEach(otherCheckbox => {
+                        if (otherCheckbox !== this) {
+                            otherCheckbox.checked = false;
+                        }
+                    });
+                    // Update the image source based on the selected animal
+                    animalImage.src = animalImages[this.value];
+                } else {
+                    // If the currently checked box is unchecked, revert to default
+                    const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                    if (!anyChecked) {
+                        animalImage.src = animalImages.default;
+                    }
+                }
+            });
+        });
+
+        // --- FILE UPLOAD LOGIC ---
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-upload');
+        const fileInfoDiv = document.getElementById('file-info');
+        const infoContentDiv = document.getElementById('info-content');
+        const fileNameDisplay = document.getElementById('file-name-display');
+
+        // Update the file name display when a file is selected
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = fileInput.files[0].name;
+            } else {
+                fileNameDisplay.textContent = 'No file selected';
+            }
+        });
+
+        uploadForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const file = fileInput.files[0];
+            if (!file) {
+                infoContentDiv.innerHTML = `<p class="font-bold text-orange-600">Whoops! Please pick a file first.</p>`;
+                fileInfoDiv.classList.remove('hidden');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                // Send the file to the Flask backend using the full URL
+                const response = await fetch('http://127.0.0.1:5000/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                // Display the file information returned from the server
+                infoContentDiv.innerHTML = `
+                    <p><strong>Name:</strong> ${result.filename}</p>
+                    <p><strong>Size:</strong> ${result.size_kb} KB</p>
+                    <p><strong>Type:</strong> ${result.type}</p>
+                `;
+                fileInfoDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                infoContentDiv.innerHTML = `<p class="font-bold text-red-500">Oh no! Something went wrong. Is the Python server running?</p>`;
+                fileInfoDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
