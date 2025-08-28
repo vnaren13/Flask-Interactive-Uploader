@@ -1,9 +1,4 @@
-# To run this code:
-# 1. Make sure you have Python installed.
-# 2. Install Flask: pip install Flask
-# 3. Save this code as `app.py` in the same directory as your HTML file (which you should save as `index.html`).
-# 4. Run the server from your terminal: flask run
-# 5. Open your web browser and go to http://127.0.0.1:5000
+
 
 from flask import Flask, request, jsonify, send_from_directory
 import os
